@@ -7,6 +7,7 @@ import time
 import os
 import re
 import json
+from security import safe_command
 
 # Functions used by the Klara client
 
@@ -89,8 +90,7 @@ def yara_scan(scan_options):
     yara_args = shlex.split(yara_cmd + os.devnull)
     # Since we are scanning /dev/null we want to make sure that yara doesn't
     # complain about the rules.
-    yara_process = subprocess.Popen(
-        yara_args,                  stdout=null_file, stderr=subprocess.PIPE)
+    yara_process = safe_command.run(subprocess.Popen, yara_args,                  stdout=null_file, stderr=subprocess.PIPE)
     # Now we wait for yara to finish....
     (stdout_data, stderr_data) = yara_process.communicate()
     # stdout_data is ""
@@ -116,10 +116,8 @@ def yara_scan(scan_options):
     yara_args = shlex.split(yara_cmd + str(fileset_scan))
     time_start = int(time.time())
     # We redirect stderr to null
-    yara_process = subprocess.Popen(
-        yara_args,                  stdout=subprocess.PIPE, stderr=null_file)
-    head_process = subprocess.Popen(
-        config.head_path_and_args,  stdout=subprocess.PIPE, stdin=yara_process.stdout)
+    yara_process = safe_command.run(subprocess.Popen, yara_args,                  stdout=subprocess.PIPE, stderr=null_file)
+    head_process = safe_command.run(subprocess.Popen, config.head_path_and_args,  stdout=subprocess.PIPE, stdin=yara_process.stdout)
     # Allow yara_process to receive a SIGPIPE if head_process exits.
     yara_process.stdout.close()
     # Now we wait for yara to finish....
@@ -172,7 +170,7 @@ def generate_md5_from_results(yara_matched_files):
     # function!
     pattern_for_md5sum_results = re.compile(r'(.*)  .*\n')
     # Prepare to run md5sum as Popen
-    p = subprocess.Popen([config.md5sum_path] + yara_matched_files,
+    p = safe_command.run(subprocess.Popen, [config.md5sum_path] + yara_matched_files,
                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     stdout_data = p.communicate()[0]
     # We want unique md5s
