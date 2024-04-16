@@ -2,9 +2,9 @@
 
 ## Requirements for running Klara:
 
-- GNU/Linux (we recommend `Ubuntu 16.04` or latest LTS)
-- SQL DB Server: MySQL / MariaDB
-- Python 2.7
+- GNU/Linux (we recommend `Ubuntu 20.04` or latest LTS)
+- DB Server: MariaDB / MySQL
+- Python 3.5+
 - Python virtualenv package
 - Yara (installed on workers)
 
@@ -73,7 +73,7 @@ mysql klara < db_schema.sql
 
 Install the packages needed to run Dispatcher:
 ```
-sudo apt -y install python-virtualenv libmysqlclient-dev python-dev git
+sudo apt -y install python3-venv libmysqlclient-dev python-dev git
 ```
 
 We recommend running dispatcher on a non-privileged user. Create an user which will be responsible to run Worker as well as Dispatcher:
@@ -99,7 +99,7 @@ su projects
 mkdir /var/projects/klara/ -p
 mkdir /var/projects/klara/logs/
 # Create the virtual-env
-virtualenv ~/.virtualenvs/klara
+python3 -m venv ~/.virtualenvs/klara
 ```
 
 Clone the repository:
@@ -143,7 +143,7 @@ notification_email_smtp_srv = "127.0.0.1"
 
 # MySQL / MariaDB settings for the Dispatcher to connect to the DB
 mysql_host      = "127.0.0.1"
-mysql_database  = "kl-klara"
+mysql_database  = "klara"
 mysql_user      = "root"
 mysql_password  = ""
 ```
@@ -183,7 +183,7 @@ In order to insert a new API key to be used by a KLara worker, a new row needs t
 
 ```
 mysql > use klara;
-mysql > INSERT INTO projetcs value ("","description here", "API auth code here");
+mysql > INSERT INTO agents value ("","description here", "API auth code here");
 ```
 
 ## Installing the Worker agent
@@ -216,7 +216,7 @@ su projects
 mkdir /var/projects/klara/ -p
 mkdir /var/projects/klara/logs/
 # Create the virtual-env
-virtualenv ~/.virtualenvs/klara
+python3 -m venv ~/.virtualenvs/klara
 ```
 
 Clone the repository:
@@ -377,7 +377,7 @@ Scan Repository control file also has some interesting modifiers that can be use
 
 Requirements for installing web interface are:
 
-- web server running at least PHP 5.6
+- web server running at least PHP 7.0 
 - the following php7 extensions:
 
 ```
